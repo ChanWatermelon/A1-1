@@ -234,6 +234,13 @@ def toggle_favorite(prompts):
         print(f"'{prompt['title']}' 프롬프트를 즐겨찾기에서 해제했습니다.")
 
 
+def show_favorites(prompts):
+    """즐겨찾기로 표시한 프롬프트만 모아서 출력한다."""
+    print("\n=== 즐겨찾기 목록 ===")
+    favorites = [p for p in prompts if p["favorite"]]
+    print_prompt_list(favorites, "즐겨찾기한 프롬프트가 없습니다.")
+
+
 def show_menu():
     """메인 메뉴를 화면에 출력한다."""
     print()
@@ -273,7 +280,7 @@ def main():
         elif choice == "6":
             toggle_favorite(prompts)
         elif choice == "7":
-            print("아직 준비 중인 기능입니다.")
+            show_favorites(prompts)
         else:
             print("잘못된 번호입니다. 메뉴에 있는 번호를 입력해주세요.")
 
