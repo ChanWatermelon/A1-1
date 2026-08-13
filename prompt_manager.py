@@ -4,6 +4,8 @@
 표준 라이브러리만 사용한다.
 """
 
+import json
+import os
 import sys
 
 # 윈도우 콘솔에서 한글과 이모지(⭐)가 깨지지 않도록 출력 인코딩을 UTF-8로 맞춘다.
@@ -18,6 +20,10 @@ CATEGORIES = ["텍스트 생성", "이미지 생성", "영상 생성", "페르�
 
 # 화면 구분선
 LINE = "─" * 40
+
+# 보너스 기능에서 사용하는 파일 이름
+DATA_FILE = "prompts.json"
+EXPORT_DIR = "export"
 
 
 def make_prompt(title, content, category, favorite=False):
@@ -309,6 +315,48 @@ def show_top_prompts(prompts, top_n=5):
               f"- 조회수 {prompt.get('views', 0)}회")
 
 
+def save_to_json(prompts):
+    """현재 프롬프트 목록을 JSON 파일로 저장한다. (보너스)"""
+    print("\n=== JSON 파일로 저장 ===")
+    try:
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(prompts, f, ensure_ascii=False, indent=2)
+    except OSError as error:
+        print(f"저장에 실패했습니다: {error}")
+        return
+
+    print(f"프롬프트 {len(prompts)}개를 '{DATA_FILE}' 파일에 저장했습니다.")
+
+
+def load_from_json(prompts):
+    """JSON 파일에서 프롬프트를 불러와 현재 목록을 교체한다. (보너스)"""
+    print("\n=== JSON 파일에서 불러오기 ===")
+    if not os.path.exists(DATA_FILE):
+        print(f"'{DATA_FILE}' 파일이 없습니다. 먼저 저장해주세요.")
+        return
+
+    try:
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            loaded = json.load(f)
+    except (OSError, json.JSONDecodeError) as error:
+        print(f"불러오기에 실패했습니다: {error}")
+        return
+
+    prompts.clear()
+    for item in loaded:
+        prompts.append(
+            make_prompt(
+                item.get("title", "제목 없음"),
+                item.get("content", ""),
+                item.get("category", "기타"),
+                item.get("favorite", False),
+            )
+        )
+        prompts[-1]["views"] = item.get("views", 0)
+
+    print(f"프롬프트 {len(prompts)}개를 불러왔습니다.")
+
+
 def show_menu():
     """메인 메뉴를 화면에 출력한다."""
     print()
@@ -324,6 +372,8 @@ def show_menu():
     print("8. 프롬프트 수정")
     print("9. 프롬프트 삭제")
     print("10. 인기 프롬프트 (조회수 Top)")
+    print("11. JSON 파일로 저장")
+    print("12. JSON 파일에서 불러오기")
     print("0. 종료")
 
 
@@ -359,6 +409,10 @@ def main():
             delete_prompt(prompts)
         elif choice == "10":
             show_top_prompts(prompts)
+        elif choice == "11":
+            save_to_json(prompts)
+        elif choice == "12":
+            load_from_json(prompts)
         else:
             print("잘못된 번호입니다. 메뉴에 있는 번호를 입력해주세요.")
 
