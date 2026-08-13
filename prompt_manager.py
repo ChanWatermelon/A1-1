@@ -140,6 +140,34 @@ def show_list(prompts):
     print_prompt_list(prompts)
 
 
+def collect_categories(prompts):
+    """미리 정의된 카테고리에 직접 입력된 카테고리를 더해서 돌려준다."""
+    categories = list(CATEGORIES)
+    for prompt in prompts:
+        if prompt["category"] not in categories:
+            categories.append(prompt["category"])
+    return categories
+
+
+def show_by_category(prompts):
+    """카테고리를 고르면 해당 카테고리의 프롬프트만 출력한다."""
+    print("\n=== 카테고리별 조회 ===")
+    categories = collect_categories(prompts)
+    for number, category in enumerate(categories, start=1):
+        print(f"{number}) {category}")
+
+    choice = input("선택: ").strip()
+    if not choice.isdigit() or not 1 <= int(choice) <= len(categories):
+        print("잘못된 번호입니다. 목록에 있는 번호를 입력해주세요.")
+        return
+
+    selected = categories[int(choice) - 1]
+    found = [p for p in prompts if p["category"] == selected]
+
+    print(f"\n[{selected}] 카테고리 프롬프트:")
+    print_prompt_list(found, f"[{selected}] 카테고리에는 등록된 프롬프트가 없습니다.")
+
+
 def show_menu():
     """메인 메뉴를 화면에 출력한다."""
     print()
@@ -170,7 +198,9 @@ def main():
             add_prompt(prompts)
         elif choice == "2":
             show_list(prompts)
-        elif choice in ("3", "4", "5", "6", "7"):
+        elif choice == "3":
+            show_by_category(prompts)
+        elif choice in ("4", "5", "6", "7"):
             print("아직 준비 중인 기능입니다.")
         else:
             print("잘못된 번호입니다. 메뉴에 있는 번호를 입력해주세요.")
