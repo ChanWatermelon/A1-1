@@ -168,6 +168,20 @@ def show_by_category(prompts):
     print_prompt_list(found, f"[{selected}] 카테고리에는 등록된 프롬프트가 없습니다.")
 
 
+def search_prompt(prompts):
+    """제목이나 내용에 검색어가 들어 있는 프롬프트를 찾아서 출력한다."""
+    print("\n=== 프롬프트 검색 ===")
+    keyword = input_nonempty("검색어: ").lower()
+
+    found = []
+    for prompt in prompts:
+        if keyword in prompt["title"].lower() or keyword in prompt["content"].lower():
+            found.append(prompt)
+
+    print("\n검색 결과:")
+    print_prompt_list(found, "검색 결과가 없습니다.")
+
+
 def show_menu():
     """메인 메뉴를 화면에 출력한다."""
     print()
@@ -200,7 +214,9 @@ def main():
             show_list(prompts)
         elif choice == "3":
             show_by_category(prompts)
-        elif choice in ("4", "5", "6", "7"):
+        elif choice == "4":
+            search_prompt(prompts)
+        elif choice in ("5", "6", "7"):
             print("아직 준비 중인 기능입니다.")
         else:
             print("잘못된 번호입니다. 메뉴에 있는 번호를 입력해주세요.")
