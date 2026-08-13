@@ -79,6 +79,44 @@ def load_default_prompts():
     ]
 
 
+def input_nonempty(message):
+    """비어 있지 않은 값을 입력받을 때까지 다시 물어본다."""
+    while True:
+        value = input(message).strip()
+        if value:
+            return value
+        print("값이 비어 있습니다. 다시 입력해주세요.")
+
+
+def choose_category():
+    """카테고리를 번호로 고르거나 직접 입력받아 돌려준다."""
+    print("\n카테고리 선택:")
+    for number, category in enumerate(CATEGORIES, start=1):
+        print(f"{number}) {category}")
+    print(f"{len(CATEGORIES) + 1}) 직접 입력")
+
+    while True:
+        choice = input("선택: ").strip()
+        if choice.isdigit():
+            index = int(choice)
+            if 1 <= index <= len(CATEGORIES):
+                return CATEGORIES[index - 1]
+            if index == len(CATEGORIES) + 1:
+                return input_nonempty("카테고리 직접 입력: ")
+        print("잘못된 번호입니다. 목록에 있는 번호를 입력해주세요.")
+
+
+def add_prompt(prompts):
+    """새 프롬프트를 입력받아 목록에 추가한다."""
+    print("\n=== 프롬프트 추가 ===")
+    title = input_nonempty("제목: ")
+    content = input_nonempty("내용: ")
+    category = choose_category()
+
+    prompts.append(make_prompt(title, content, category))
+    print(f"\n'{title}' 프롬프트가 추가되었습니다!")
+
+
 def show_menu():
     """메인 메뉴를 화면에 출력한다."""
     print()
@@ -105,7 +143,9 @@ def main():
         if choice == "0":
             print("프로그램을 종료합니다. 안녕히 가세요!")
             break
-        elif choice in ("1", "2", "3", "4", "5", "6", "7"):
+        elif choice == "1":
+            add_prompt(prompts)
+        elif choice in ("2", "3", "4", "5", "6", "7"):
             print("아직 준비 중인 기능입니다.")
         else:
             print("잘못된 번호입니다. 메뉴에 있는 번호를 입력해주세요.")
