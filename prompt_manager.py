@@ -182,6 +182,38 @@ def search_prompt(prompts):
     print_prompt_list(found, "검색 결과가 없습니다.")
 
 
+def select_prompt_index(prompts, message="번호 입력: "):
+    """번호를 입력받아 리스트 인덱스로 바꿔 준다. 잘못된 입력이면 None을 돌려준다."""
+    if not prompts:
+        print("등록된 프롬프트가 없습니다.")
+        return None
+
+    choice = input(message).strip()
+    if not choice.isdigit() or not 1 <= int(choice) <= len(prompts):
+        print("잘못된 번호입니다. 1 ~ %d 사이의 번호를 입력해주세요." % len(prompts))
+        return None
+    return int(choice) - 1
+
+
+def show_detail(prompts):
+    """번호로 고른 프롬프트의 전체 내용을 출력한다."""
+    print("\n=== 프롬프트 상세 보기 ===")
+    index = select_prompt_index(prompts)
+    if index is None:
+        return
+
+    prompt = prompts[index]
+    print()
+    print(LINE)
+    print(f"제목: {prompt['title']}")
+    print(f"카테고리: {prompt['category']}")
+    print(f"즐겨찾기: {'⭐' if prompt['favorite'] else '없음'}")
+    print(LINE)
+    print("내용:")
+    print(prompt["content"])
+    print(LINE)
+
+
 def show_menu():
     """메인 메뉴를 화면에 출력한다."""
     print()
@@ -216,7 +248,9 @@ def main():
             show_by_category(prompts)
         elif choice == "4":
             search_prompt(prompts)
-        elif choice in ("5", "6", "7"):
+        elif choice == "5":
+            show_detail(prompts)
+        elif choice in ("6", "7"):
             print("아직 준비 중인 기능입니다.")
         else:
             print("잘못된 번호입니다. 메뉴에 있는 번호를 입력해주세요.")
