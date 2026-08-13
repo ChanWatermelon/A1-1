@@ -357,6 +357,53 @@ def load_from_json(prompts):
     print(f"프롬프트 {len(prompts)}개를 불러왔습니다.")
 
 
+def make_markdown(category, prompts):
+    """한 카테고리의 프롬프트들을 Markdown 문자열로 만든다. (보너스)"""
+    lines = [f"# {category}", ""]
+    for prompt in prompts:
+        star = " ⭐" if prompt["favorite"] else ""
+        lines.append(f"## {prompt['title']}{star}")
+        lines.append("")
+        lines.append("```")
+        lines.append(prompt["content"])
+        lines.append("```")
+        lines.append("")
+    return "\n".join(lines)
+
+
+def export_markdown(prompts):
+    """카테고리별로 Markdown 파일을 만들어 export 폴더에 저장한다. (보너스)"""
+    print("\n=== 카테고리별 Markdown 내보내기 ===")
+    if not prompts:
+        print("내보낼 프롬프트가 없습니다.")
+        return
+
+    try:
+        os.makedirs(EXPORT_DIR, exist_ok=True)
+    except OSError as error:
+        print(f"폴더를 만들지 못했습니다: {error}")
+        return
+
+    saved = 0
+    for category in collect_categories(prompts):
+        items = [p for p in prompts if p["category"] == category]
+        if not items:
+            continue
+
+        filename = os.path.join(EXPORT_DIR, category.replace(" ", "_") + ".md")
+        try:
+            with open(filename, "w", encoding="utf-8") as f:
+                f.write(make_markdown(category, items))
+        except OSError as error:
+            print(f"'{filename}' 저장 실패: {error}")
+            continue
+
+        print(f"- {filename} ({len(items)}개)")
+        saved += 1
+
+    print(f"\n총 {saved}개의 Markdown 파일을 만들었습니다.")
+
+
 def show_menu():
     """메인 메뉴를 화면에 출력한다."""
     print()
@@ -374,6 +421,7 @@ def show_menu():
     print("10. 인기 프롬프트 (조회수 Top)")
     print("11. JSON 파일로 저장")
     print("12. JSON 파일에서 불러오기")
+    print("13. 카테고리별 Markdown 내보내기")
     print("0. 종료")
 
 
@@ -413,6 +461,8 @@ def main():
             save_to_json(prompts)
         elif choice == "12":
             load_from_json(prompts)
+        elif choice == "13":
+            export_markdown(prompts)
         else:
             print("잘못된 번호입니다. 메뉴에 있는 번호를 입력해주세요.")
 
