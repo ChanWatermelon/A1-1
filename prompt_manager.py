@@ -27,6 +27,7 @@ def make_prompt(title, content, category, favorite=False):
         "content": content,
         "category": category,
         "favorite": favorite,
+        "views": 0,  # 상세 보기 횟수 (보너스)
     }
 
 
@@ -203,11 +204,14 @@ def show_detail(prompts):
         return
 
     prompt = prompts[index]
+    prompt["views"] = prompt.get("views", 0) + 1  # 조회수 기록 (보너스)
+
     print()
     print(LINE)
     print(f"제목: {prompt['title']}")
     print(f"카테고리: {prompt['category']}")
     print(f"즐겨찾기: {'⭐' if prompt['favorite'] else '없음'}")
+    print(f"조회수: {prompt['views']}회")
     print(LINE)
     print("내용:")
     print(prompt["content"])
@@ -291,6 +295,20 @@ def delete_prompt(prompts):
     print(f"'{title}' 프롬프트를 삭제했습니다.")
 
 
+def show_top_prompts(prompts, top_n=5):
+    """조회수가 높은 순으로 프롬프트를 정렬해서 출력한다. (보너스)"""
+    print(f"\n=== 인기 프롬프트 Top {top_n} ===")
+    if not prompts:
+        print("등록된 프롬프트가 없습니다.")
+        return
+
+    ranked = sorted(prompts, key=lambda p: p.get("views", 0), reverse=True)
+    for number, prompt in enumerate(ranked[:top_n], start=1):
+        star = " ⭐" if prompt["favorite"] else ""
+        print(f"{number}. [{prompt['category']}] {prompt['title']}{star} "
+              f"- 조회수 {prompt.get('views', 0)}회")
+
+
 def show_menu():
     """메인 메뉴를 화면에 출력한다."""
     print()
@@ -305,6 +323,7 @@ def show_menu():
     print("--- 보너스 기능 ---")
     print("8. 프롬프트 수정")
     print("9. 프롬프트 삭제")
+    print("10. 인기 프롬프트 (조회수 Top)")
     print("0. 종료")
 
 
@@ -338,6 +357,8 @@ def main():
             edit_prompt(prompts)
         elif choice == "9":
             delete_prompt(prompts)
+        elif choice == "10":
+            show_top_prompts(prompts)
         else:
             print("잘못된 번호입니다. 메뉴에 있는 번호를 입력해주세요.")
 
