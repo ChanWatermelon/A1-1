@@ -241,6 +241,56 @@ def show_favorites(prompts):
     print_prompt_list(favorites, "즐겨찾기한 프롬프트가 없습니다.")
 
 
+def edit_prompt(prompts):
+    """번호로 고른 프롬프트의 제목/내용/카테고리를 수정한다. (보너스)"""
+    print("\n=== 프롬프트 수정 ===")
+    print_prompt_list(prompts)
+    if not prompts:
+        return
+
+    index = select_prompt_index(prompts, "\n수정할 프롬프트 번호: ")
+    if index is None:
+        return
+
+    prompt = prompts[index]
+    print("\n(그냥 엔터를 누르면 기존 값을 그대로 둔다)")
+
+    title = input(f"제목 [{prompt['title']}]: ").strip()
+    if title:
+        prompt["title"] = title
+
+    content = input("내용 (수정할 내용 입력): ").strip()
+    if content:
+        prompt["content"] = content
+
+    answer = input(f"카테고리를 바꾸시겠습니까? 현재 [{prompt['category']}] (y/n): ").strip()
+    if answer.lower() == "y":
+        prompt["category"] = choose_category()
+
+    print(f"\n'{prompt['title']}' 프롬프트를 수정했습니다!")
+
+
+def delete_prompt(prompts):
+    """번호로 고른 프롬프트를 목록에서 삭제한다. (보너스)"""
+    print("\n=== 프롬프트 삭제 ===")
+    print_prompt_list(prompts)
+    if not prompts:
+        return
+
+    index = select_prompt_index(prompts, "\n삭제할 프롬프트 번호: ")
+    if index is None:
+        return
+
+    title = prompts[index]["title"]
+    answer = input(f"'{title}' 프롬프트를 정말 삭제할까요? (y/n): ").strip()
+    if answer.lower() != "y":
+        print("삭제를 취소했습니다.")
+        return
+
+    prompts.pop(index)
+    print(f"'{title}' 프롬프트를 삭제했습니다.")
+
+
 def show_menu():
     """메인 메뉴를 화면에 출력한다."""
     print()
@@ -252,6 +302,9 @@ def show_menu():
     print("5. 프롬프트 상세 보기")
     print("6. 즐겨찾기 관리")
     print("7. 즐겨찾기 목록")
+    print("--- 보너스 기능 ---")
+    print("8. 프롬프트 수정")
+    print("9. 프롬프트 삭제")
     print("0. 종료")
 
 
@@ -281,6 +334,10 @@ def main():
             toggle_favorite(prompts)
         elif choice == "7":
             show_favorites(prompts)
+        elif choice == "8":
+            edit_prompt(prompts)
+        elif choice == "9":
+            delete_prompt(prompts)
         else:
             print("잘못된 번호입니다. 메뉴에 있는 번호를 입력해주세요.")
 
