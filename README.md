@@ -48,7 +48,7 @@ init.defaultbranch=main
 ![개발 환경 확인](docs/dev-environment.png)
 
 > 윈도우에서 `python`은 스토어 별칭으로 잡히는 경우가 있어 이 프로젝트에서는 `py` 명령을 사용합니다.
-> `hello.py`는 파이썬 실행이 정상인지 확인하려고 만든 파일입니다. (`py hello.py` → `Hello`)
+> 파이썬 실행 확인(`print("Hello")`)은 `hello.py`로 진행했으며, 확인 후 정리해 커밋 기록에만 남아 있습니다. (`840ddaa chore: 개발 환경 확인용 hello.py 추가`)
 
 ## 실행 방법
 
@@ -190,12 +190,19 @@ prompts = [
 
 ```
 A1-1/
-├── prompt_manager.py   # 프로그램 본체
-├── hello.py            # 개발 환경 확인용 파일
+├── prompt_manager.py   # 프로그램 본체 (모든 기능)
 ├── README.md
 ├── .gitignore          # __pycache__, prompts.json, export/ 등 제외
 └── docs/               # README에 쓰는 실행 화면 스크린샷
+    ├── dev-environment.png
+    ├── menu.png
+    ├── list.png
+    ├── detail.png
+    └── git-log-graph.png
 ```
+
+프로그램을 실행하면 `prompts.json`(11번 기능)과 `export/`(13번 기능)가 만들어질 수 있는데,
+결과물이라 `.gitignore`로 제외했습니다.
 
 ## Git 작업 정책
 
