@@ -113,10 +113,63 @@ def choose_category():
         print("잘못된 번호입니다. 목록에 있는 번호를 입력해주세요.")
 
 
+def normalize_title(title):
+    """제목을 비교하기 좋게 다듬는다. (앞뒤/중복 공백 제거, 대소문자 무시)"""
+    return " ".join(title.split()).lower()
+
+
+def find_duplicate_title(prompts, title, skip_index=None):
+    """같은 제목을 가진 프롬프트의 위치를 찾는다. 없으면 None을 돌려준다."""
+    target = normalize_title(title)
+    for index, prompt in enumerate(prompts):
+        if index == skip_index:  # 수정할 때 자기 자신은 건너뛴다
+            continue
+        if normalize_title(prompt["title"]) == target:
+            return index
+    return None
+
+
+def make_unique_title(prompts, title, skip_index=None):
+    """제목 뒤에 (2), (3) ... 을 붙여 겹치지 않는 제목을 만든다."""
+    number = 2
+    while find_duplicate_title(prompts, f"{title} ({number})", skip_index) is not None:
+        number += 1
+    return f"{title} ({number})"
+
+
+def resolve_duplicate_title(prompts, title, skip_index=None):
+    """제목이 겹치면 어떻게 할지 물어본다. 취소를 고르면 None을 돌려준다."""
+    while True:
+        index = find_duplicate_title(prompts, title, skip_index)
+        if index is None:
+            return title
+
+        print(f"\n[알림] 같은 제목이 이미 있습니다 "
+              f"-> {format_prompt_line(index + 1, prompts[index])}")
+        print("1) 다른 제목으로 다시 입력")
+        print("2) 뒤에 번호를 붙여 저장 (예: 제목 (2))")
+        print("0) 취소")
+
+        choice = input("선택: ").strip()
+        if choice == "1":
+            title = input_nonempty("새 제목: ")
+        elif choice == "2":
+            return make_unique_title(prompts, title, skip_index)
+        elif choice == "0":
+            return None
+        else:
+            print("잘못된 번호입니다. 0, 1, 2 중에서 선택해주세요.")
+
+
 def add_prompt(prompts):
     """새 프롬프트를 입력받아 목록에 추가한다."""
     print("\n=== 프롬프트 추가 ===")
     title = input_nonempty("제목: ")
+    title = resolve_duplicate_title(prompts, title)
+    if title is None:
+        print("프롬프트 추가를 취소했습니다.")
+        return
+
     content = input_nonempty("내용: ")
     category = choose_category()
 
@@ -267,6 +320,10 @@ def edit_prompt(prompts):
 
     title = input(f"제목 [{prompt['title']}]: ").strip()
     if title:
+        title = resolve_duplicate_title(prompts, title, skip_index=index)
+        if title is None:
+            print("수정을 취소했습니다.")
+            return
         prompt["title"] = title
 
     content = input("내용 (수정할 내용 입력): ").strip()
